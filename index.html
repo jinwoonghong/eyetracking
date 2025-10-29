@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4A90E2">
+    <meta name="description" content="눈으로 조작하는 혁신적인 모바일 게임">
+    
+    <!-- PWA 설정 -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    
+    <title>Eye Catch - 아이트래킹 게임</title>
+    
+    <!-- 스타일 -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- WebGazer.js 라이브러리 (아이트래킹) -->
+    <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+</head>
+<body>
+    <!-- 메인 화면 -->
+    <div id="main-screen" class="screen active">
+        <div class="container">
+            <h1 class="game-title">👁️ Eye Catch</h1>
+            <p class="game-subtitle">눈으로 타겟을 잡아라!</p>
+            
+            <div class="menu-buttons">
+                <button class="btn btn-primary" onclick="game.showCalibration()">
+                    🎯 게임 시작
+                </button>
+                <button class="btn btn-secondary" onclick="game.showInstructions()">
+                    📖 게임 방법
+                </button>
+                <button class="btn btn-secondary" onclick="game.showLeaderboard()">
+                    🏆 순위표
+                </button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">최고 점수</span>
+                    <span class="stat-value" id="high-score">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 방법 화면 -->
+    <div id="instructions-screen" class="screen">
+        <div class="container">
+            <h2>📖 게임 방법</h2>
+            <div class="instructions">
+                <div class="instruction-item">
+                    <span class="instruction-icon">👀</span>
+                    <h3>1. 캘리브레이션</h3>
+                    <p>게임 시작 전 화면의 점들을 순서대로 응시하여 눈 추적을 보정합니다.</p>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-icon">🎯</span>
+                    <h3>2. 타겟 응시</h3>
+                    <p>화면에 나타나는 원형 타겟을 눈으로 응시하세요. 2초간 응시하면 점수를 획득합니다!</p>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-icon">⚡</span>
+                    <h3>3. 시간 제한</h3>
+                    <p>60초 안에 최대한 많은 타겟을 캐치하세요. 레벨이 올라갈수록 더 어려워집니다!</p>
+                </div>
+                <div class="instruction-item">
+                    <span class="instruction-icon">💎</span>
+                    <h3>4. 보너스 타겟</h3>
+                    <p>가끔 나타나는 황금 타겟은 2배의 점수를 줍니다!</p>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="game.showMainScreen()">메인으로</button>
+        </div>
+    </div>
+
+    <!-- 캘리브레이션 화면 -->
+    <div id="calibration-screen" class="screen">
+        <div class="container">
+            <h2>👁️ 눈 추적 보정</h2>
+            <p class="calibration-instruction">화면의 점들을 순서대로 응시해주세요</p>
+            <div class="calibration-progress">
+                <span id="calibration-step">1</span> / 9
+            </div>
+            <div id="calibration-container" class="calibration-container">
+                <!-- 캘리브레이션 포인트들이 여기에 동적으로 생성됨 -->
+            </div>
+            <button class="btn btn-secondary" onclick="game.showMainScreen()">취소</button>
+        </div>
+    </div>
+
+    <!-- 게임 플레이 화면 -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="info-label">점수</span>
+                    <span class="info-value" id="current-score">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">레벨</span>
+                    <span class="info-value" id="current-level">1</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">시간</span>
+                    <span class="info-value" id="time-left">60</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="game-canvas" class="game-canvas">
+            <!-- 타겟들이 여기에 동적으로 생성됨 -->
+        </div>
+        
+        <!-- 시선 표시 (디버깅용, 나중에 숨길 수 있음) -->
+        <div id="gaze-dot" class="gaze-dot"></div>
+    </div>
+
+    <!-- 게임 오버 화면 -->
+    <div id="gameover-screen" class="screen">
+        <div class="container">
+            <h2>🎮 게임 종료!</h2>
+            <div class="final-score-container">
+                <p class="final-score-label">최종 점수</p>
+                <p class="final-score" id="final-score">0</p>
+                <p class="score-message" id="score-message"></p>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-row">
+                    <span>도달 레벨</span>
+                    <span id="final-level">1</span>
+                </div>
+                <div class="stat-row">
+                    <span>캐치한 타겟</span>
+                    <span id="targets-caught">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>정확도</span>
+                    <span id="accuracy">0%</span>
+                </div>
+            </div>
+            
+            <div class="menu-buttons">
+                <button class="btn btn-primary" onclick="game.restartGame()">
+                    🔄 다시 하기
+                </button>
+                <button class="btn btn-secondary" onclick="game.showMainScreen()">
+                    🏠 메인으로
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 순위표 화면 -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="container">
+            <h2>🏆 순위표</h2>
+            <div id="leaderboard-list" class="leaderboard-list">
+                <!-- 순위가 여기에 동적으로 생성됨 -->
+            </div>
+            <button class="btn btn-primary" onclick="game.showMainScreen()">메인으로</button>
+        </div>
+    </div>
+
+    <!-- 로딩 오버레이 -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">아이트래킹 초기화 중...</p>
+    </div>
+
+    <!-- 스크립트 -->
+    <script src="js/game.js"></script>
+    <script src="js/eyetracking.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
