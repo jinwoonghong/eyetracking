@@ -48,7 +48,7 @@ class Game {
         
         // 아이트래킹 초기화 및 캘리브레이션 시작
         if (!eyeTracking.isInitialized) {
-            this.showLoading('아이트래킹 초기화 중...');
+            this.showLoading('카메라 초기화 중...\n카메라 권한을 허용해주세요!');
             eyeTracking.initialize().then(() => {
                 this.hideLoading();
                 eyeTracking.startCalibration(() => {
@@ -64,6 +64,23 @@ class Game {
             eyeTracking.startCalibration(() => {
                 setTimeout(() => this.startGame(), 500);
             });
+        }
+    }
+
+    // 캘리브레이션 스킵
+    skipCalibration() {
+        if (!eyeTracking.isInitialized) {
+            this.showLoading('카메라 초기화 중...');
+            eyeTracking.initialize().then(() => {
+                this.hideLoading();
+                setTimeout(() => this.startGame(), 500);
+            }).catch(error => {
+                this.hideLoading();
+                alert('카메라 권한이 필요합니다.');
+                this.showMainScreen();
+            });
+        } else {
+            this.startGame();
         }
     }
 

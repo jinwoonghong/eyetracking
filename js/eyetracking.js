@@ -14,13 +14,16 @@ class EyeTracking {
         return new Promise((resolve, reject) => {
             try {
                 // WebGazer 설정
-                webgazer.params.showVideoPreview = false;
-                webgazer.params.showFaceOverlay = false;
-                webgazer.params.showFaceFeedbackBox = false;
+                webgazer.params.showVideoPreview = true; // 비디오 프리뷰 활성화
+                webgazer.params.showFaceOverlay = true; // 얼굴 오버레이 표시
+                webgazer.params.showFaceFeedbackBox = true; // 피드백 박스 표시
                 webgazer.params.showGazeDot = false;
                 
                 // WebGazer 시작
                 webgazer.begin();
+                
+                // 비디오 크기 및 위치 조정
+                webgazer.setVideoViewerSize(200, 150); // 작은 프리뷰 크기
                 
                 // 시선 추적 리스너 설정
                 webgazer.setGazeListener((data, clock) => {
@@ -40,11 +43,12 @@ class EyeTracking {
                     }
                 });
                 
-                // 초기화 완료를 위해 2초 대기
+                // 초기화 완료를 위해 3초 대기 (더 긴 초기화 시간)
                 setTimeout(() => {
                     this.isInitialized = true;
+                    console.log('아이트래킹 초기화 완료');
                     resolve();
-                }, 2000);
+                }, 3000);
                 
             } catch (error) {
                 console.error('아이트래킹 초기화 실패:', error);
