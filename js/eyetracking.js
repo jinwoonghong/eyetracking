@@ -85,10 +85,39 @@ class EyeTracking {
     // 캘리브레이션 포인트 생성
     generateCalibrationPoints() {
         const container = document.getElementById('calibration-container');
-        const width = container.clientWidth;
-        const height = container.clientHeight;
+        if (!container) {
+            console.error('컨테이너를 찾을 수 없습니다');
+            return [];
+        }
         
-        const margin = 60;
+        // 컨테이너 크기 강제 갱신
+        container.style.display = 'block';
+        const rect = container.getBoundingClientRect();
+        const width = rect.width || container.offsetWidth || 600; // 기본값 600
+        const height = rect.height || container.offsetHeight || 400; // 기본값 400
+        
+        console.log('컨테이너 실제 크기:', width, 'x', height);
+        
+        if (width === 0 || height === 0) {
+            console.error('컨테이너 크기가 0입니다! 기본값 사용');
+            // 기본값으로 설정
+            const defaultWidth = 600;
+            const defaultHeight = 400;
+            const margin = 60;
+            return [
+                { x: margin, y: margin },
+                { x: defaultWidth / 2, y: margin },
+                { x: defaultWidth - margin, y: margin },
+                { x: margin, y: defaultHeight / 2 },
+                { x: defaultWidth / 2, y: defaultHeight / 2 },
+                { x: defaultWidth - margin, y: defaultHeight / 2 },
+                { x: margin, y: defaultHeight - margin },
+                { x: defaultWidth / 2, y: defaultHeight - margin },
+                { x: defaultWidth - margin, y: defaultHeight - margin }
+            ];
+        }
+        
+        const margin = Math.min(60, width * 0.1); // 동적 마진
         const positions = [
             { x: margin, y: margin }, // 왼쪽 상단
             { x: width / 2, y: margin }, // 중앙 상단
@@ -101,6 +130,7 @@ class EyeTracking {
             { x: width - margin, y: height - margin } // 오른쪽 하단
         ];
         
+        console.log('생성된 포인트들:', positions);
         return positions;
     }
 
@@ -276,6 +306,30 @@ class EyeTracking {
     // 현재 시선 위치 가져오기
     getCurrentGaze() {
         return this.gazeData;
+    }
+
+    // 강제 포인트 렌더링 (디버깅용)
+    forceRenderPoints() {
+        console.log('🔧 강제 렌더링 시작');
+        const container = document.getElementById('calibration-container');
+        if (!container) {
+            alert('컨테이너를 찾을 수 없습니다!');
+            return;
+        }
+        
+        console.log('컨테이너 정보:', {
+            width: container.offsetWidth,
+            height: container.offsetHeight,
+            display: window.getComputedStyle(container).display,
+            visibility: window.getComputedStyle(container).visibility
+        });
+        
+        // 포인트 생성
+        this.calibrationPoints = this.generateCalibrationPoints();
+        this.renderCalibrationPoints();
+        this.activateCalibrationPoint(0);
+        
+        alert('포인트 강제 렌더링 완료!\n' + this.calibrationPoints.length + '개 포인트 생성됨\n콘솔(F12)에서 상세 정보 확인');
     }
 }
 

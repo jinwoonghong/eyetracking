@@ -42,7 +42,7 @@ class Game {
 
     // 캘리브레이션 화면 표시
     showCalibration() {
-        console.log('캘리브레이션 시작');
+        console.log('=== 캘리브레이션 시작 ===');
         this.hideAllScreens();
         this.state = 'calibration';
         
@@ -50,30 +50,43 @@ class Game {
         if (!eyeTracking.isInitialized) {
             this.showLoading('카메라 초기화 중...\n카메라 권한을 허용해주세요!');
             eyeTracking.initialize().then(() => {
-                console.log('카메라 초기화 완료');
+                console.log('✅ 카메라 초기화 완료');
                 this.hideLoading();
-                // 화면 표시 후 캘리브레이션 시작
-                document.getElementById('calibration-screen').classList.add('active');
+                // 화면 표시
+                const calibScreen = document.getElementById('calibration-screen');
+                calibScreen.classList.add('active');
+                console.log('캘리브레이션 화면 표시됨');
+                
+                // 화면이 완전히 렌더링될 때까지 대기 (더 긴 시간)
                 setTimeout(() => {
+                    console.log('포인트 생성 시작...');
+                    const container = document.getElementById('calibration-container');
+                    console.log('컨테이너 상태:', {
+                        exists: !!container,
+                        visible: container ? window.getComputedStyle(container).display : 'N/A',
+                        width: container ? container.offsetWidth : 0,
+                        height: container ? container.offsetHeight : 0
+                    });
+                    
                     eyeTracking.startCalibration(() => {
-                        console.log('캘리브레이션 완료!');
-                        // 캘리브레이션 완료 후 게임 시작
+                        console.log('✅ 캘리브레이션 완료!');
                         setTimeout(() => this.startGame(), 500);
                     });
-                }, 500);
+                }, 1000); // 500ms → 1000ms로 증가
             }).catch(error => {
-                console.error('카메라 초기화 실패:', error);
+                console.error('❌ 카메라 초기화 실패:', error);
                 this.hideLoading();
                 alert('카메라 권한이 필요합니다. 브라우저 설정에서 카메라를 허용해주세요.');
                 this.showMainScreen();
             });
         } else {
-            document.getElementById('calibration-screen').classList.add('active');
+            const calibScreen = document.getElementById('calibration-screen');
+            calibScreen.classList.add('active');
             setTimeout(() => {
                 eyeTracking.startCalibration(() => {
                     setTimeout(() => this.startGame(), 500);
                 });
-            }, 500);
+            }, 1000); // 500ms → 1000ms로 증가
         }
     }
 
