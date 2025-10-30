@@ -42,28 +42,38 @@ class Game {
 
     // 캘리브레이션 화면 표시
     showCalibration() {
+        console.log('캘리브레이션 시작');
         this.hideAllScreens();
-        document.getElementById('calibration-screen').classList.add('active');
         this.state = 'calibration';
         
         // 아이트래킹 초기화 및 캘리브레이션 시작
         if (!eyeTracking.isInitialized) {
             this.showLoading('카메라 초기화 중...\n카메라 권한을 허용해주세요!');
             eyeTracking.initialize().then(() => {
+                console.log('카메라 초기화 완료');
                 this.hideLoading();
-                eyeTracking.startCalibration(() => {
-                    // 캘리브레이션 완료 후 게임 시작
-                    setTimeout(() => this.startGame(), 500);
-                });
+                // 화면 표시 후 캘리브레이션 시작
+                document.getElementById('calibration-screen').classList.add('active');
+                setTimeout(() => {
+                    eyeTracking.startCalibration(() => {
+                        console.log('캘리브레이션 완료!');
+                        // 캘리브레이션 완료 후 게임 시작
+                        setTimeout(() => this.startGame(), 500);
+                    });
+                }, 500);
             }).catch(error => {
+                console.error('카메라 초기화 실패:', error);
                 this.hideLoading();
                 alert('카메라 권한이 필요합니다. 브라우저 설정에서 카메라를 허용해주세요.');
                 this.showMainScreen();
             });
         } else {
-            eyeTracking.startCalibration(() => {
-                setTimeout(() => this.startGame(), 500);
-            });
+            document.getElementById('calibration-screen').classList.add('active');
+            setTimeout(() => {
+                eyeTracking.startCalibration(() => {
+                    setTimeout(() => this.startGame(), 500);
+                });
+            }, 500);
         }
     }
 

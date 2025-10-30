@@ -68,12 +68,14 @@ class EyeTracking {
 
     // 캘리브레이션 시작
     startCalibration(onComplete) {
+        console.log('캘리브레이션 시작함수 호출');
         this.isCalibrated = false;
         this.currentCalibrationIndex = 0;
         this.onCalibrationComplete = onComplete;
         
         // 캘리브레이션 포인트 생성 (3x3 그리드)
         this.calibrationPoints = this.generateCalibrationPoints();
+        console.log('캘리브레이션 포인트 생성:', this.calibrationPoints);
         this.renderCalibrationPoints();
         
         // 첫 번째 포인트 활성화
@@ -105,7 +107,12 @@ class EyeTracking {
     // 캘리브레이션 포인트 렌더링
     renderCalibrationPoints() {
         const container = document.getElementById('calibration-container');
+        if (!container) {
+            console.error('캘리브레이션 컨테이너를 찾을 수 없습니다');
+            return;
+        }
         container.innerHTML = '';
+        console.log('컨테이너 크기:', container.clientWidth, 'x', container.clientHeight);
         
         this.calibrationPoints.forEach((point, index) => {
             const pointElement = document.createElement('div');
@@ -115,11 +122,20 @@ class EyeTracking {
             pointElement.dataset.index = index;
             
             pointElement.addEventListener('click', () => {
+                console.log('포인트 클릭:', index);
+                this.onCalibrationPointClick(index);
+            });
+            
+            // 터치 이벤트도 추가
+            pointElement.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                console.log('포인트 터치:', index);
                 this.onCalibrationPointClick(index);
             });
             
             container.appendChild(pointElement);
         });
+        console.log('포인트 렌더링 완료, 총', this.calibrationPoints.length, '개');
     }
 
     // 캘리브레이션 포인트 활성화
@@ -142,29 +158,43 @@ class EyeTracking {
 
     // 캘리브레이션 포인트 클릭
     async onCalibrationPointClick(index) {
-        if (index !== this.currentCalibrationIndex) return;
+        console.log('포인트 클릭 처리:', index, '현재 인덱스:', this.currentCalibrationIndex);
+        if (index !== this.currentCalibrationIndex) {
+            console.log('순서가 맞지 않음');
+            return;
+        }
         
         const point = this.calibrationPoints[index];
+        const container = document.getElementById('calibration-container');
+        const rect = container.getBoundingClientRect();
+        
+        // 컨테이너 오프셋을 고려한 실제 화면 좌표
+        const screenX = rect.left + point.x;
+        const screenY = rect.top + point.y;
+        
+        console.log('캘리브레이션 좌표:', screenX, screenY);
         
         // WebGazer에 클릭 위치 등록
-        await webgazer.recordScreenPosition(point.x, point.y);
+        await webgazer.recordScreenPosition(screenX, screenY);
         
         // 여러 번 클릭하여 정확도 향상
         for (let i = 0; i < 5; i++) {
             await new Promise(resolve => setTimeout(resolve, 100));
             await webgazer.recordScreenPosition(
-                point.x + (Math.random() - 0.5) * 10,
-                point.y + (Math.random() - 0.5) * 10
+                screenX + (Math.random() - 0.5) * 10,
+                screenY + (Math.random() - 0.5) * 10
             );
         }
         
         this.currentCalibrationIndex++;
+        console.log('다음 인덱스:', this.currentCalibrationIndex);
         
         if (this.currentCalibrationIndex < this.calibrationPoints.length) {
             // 다음 포인트로
             this.activateCalibrationPoint(this.currentCalibrationIndex);
         } else {
             // 캘리브레이션 완료
+            console.log('모든 포인트 완료!');
             this.isCalibrated = true;
             if (this.onCalibrationComplete) {
                 this.onCalibrationComplete();
