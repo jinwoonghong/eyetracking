@@ -81,18 +81,20 @@
         <div class="container">
             <h2>👁️ 눈 추적 보정</h2>
             <p class="calibration-instruction">
-                <strong>카메라를 허용하고</strong> 오른쪽 상단의 작은 카메라 화면에서 얼굴이 보이는지 확인하세요.<br>
-                그 다음 <strong>깜빡이는 점들을 순서대로 클릭</strong>해주세요!
+                ✅ <strong>카메라 확인:</strong> 오른쪽 상단에서 얼굴이 보이나요?<br>
+                🎯 <strong>아래 박스 안의 깜빡이는 파란 점</strong>을 순서대로 터치/클릭하세요!<br>
+                <small style="color: var(--warning-color);">※ 점이 안 보이면 "빠른 시작" 버튼을 눌러주세요</small>
             </p>
             <div class="calibration-progress">
                 <span id="calibration-step">1</span> / 9
             </div>
             <div id="calibration-container" class="calibration-container">
                 <!-- 캘리브레이션 포인트들이 여기에 동적으로 생성됨 -->
+                <div class="calibration-hint">여기에 점들이 나타납니다</div>
             </div>
             <div class="calibration-buttons">
-                <button class="btn btn-primary" onclick="game.skipCalibration()">빠른 시작 (보정 스킵)</button>
-                <button class="btn btn-secondary" onclick="game.showMainScreen()">취소</button>
+                <button class="btn btn-primary" onclick="game.skipCalibration()">⚡ 빠른 시작 (보정 스킵)</button>
+                <button class="btn btn-secondary" onclick="game.showMainScreen()">❌ 취소</button>
             </div>
         </div>
     </div>

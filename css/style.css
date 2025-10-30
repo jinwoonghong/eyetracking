@@ -39,6 +39,7 @@ body {
     border-radius: 12px !important;
     z-index: 9998 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    transform: scaleX(-1) !important; /* 거울 모드 */
 }
 
 #webgazerVideoCanvas,
@@ -219,6 +220,17 @@ body {
     margin-top: 1rem;
 }
 
+.calibration-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
 .calibration-progress {
     font-size: 1.5rem;
     font-weight: 700;
@@ -233,9 +245,10 @@ body {
     min-height: 300px;
     max-height: 60vh;
     background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(74, 144, 226, 0.3);
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
-    overflow: hidden;
+    overflow: visible; /* 포인트가 잘리지 않도록 */
 }
 
 @media (max-width: 768px) {
@@ -252,15 +265,18 @@ body {
 
 .calibration-point {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background: var(--primary-color);
-    border: 3px solid white;
+    border: 4px solid white;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(74, 144, 226, 0.6);
+    box-shadow: 0 0 30px rgba(74, 144, 226, 0.8);
     animation: pointPulse 1s ease-in-out infinite;
+    transform: translate(-50%, -50%); /* 중앙 정렬 */
+    z-index: 10;
+    touch-action: manipulation; /* 모바일 터치 최적화 */
 }
 
 @keyframes pointPulse {

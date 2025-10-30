@@ -109,10 +109,22 @@ class EyeTracking {
         const container = document.getElementById('calibration-container');
         if (!container) {
             console.error('캘리브레이션 컨테이너를 찾을 수 없습니다');
+            alert('캘리브레이션 화면을 찾을 수 없습니다. 페이지를 새로고침 해주세요.');
             return;
         }
-        container.innerHTML = '';
+        
+        // 힌트 텍스트 제거
+        const hint = container.querySelector('.calibration-hint');
+        if (hint) hint.remove();
+        
         console.log('컨테이너 크기:', container.clientWidth, 'x', container.clientHeight);
+        
+        // 컨테이너가 제대로 렌더링되었는지 확인
+        if (container.clientWidth === 0 || container.clientHeight === 0) {
+            console.error('컨테이너 크기가 0입니다!');
+            alert('화면 로딩 문제가 발생했습니다. "빠른 시작" 버튼을 눌러주세요.');
+            return;
+        }
         
         this.calibrationPoints.forEach((point, index) => {
             const pointElement = document.createElement('div');
@@ -121,7 +133,18 @@ class EyeTracking {
             pointElement.style.top = point.y + 'px';
             pointElement.dataset.index = index;
             
-            pointElement.addEventListener('click', () => {
+            // 숫자 표시 추가
+            pointElement.textContent = (index + 1);
+            pointElement.style.display = 'flex';
+            pointElement.style.alignItems = 'center';
+            pointElement.style.justifyContent = 'center';
+            pointElement.style.fontSize = '18px';
+            pointElement.style.fontWeight = 'bold';
+            pointElement.style.color = 'white';
+            
+            pointElement.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 console.log('포인트 클릭:', index);
                 this.onCalibrationPointClick(index);
             });
@@ -129,13 +152,15 @@ class EyeTracking {
             // 터치 이벤트도 추가
             pointElement.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 console.log('포인트 터치:', index);
                 this.onCalibrationPointClick(index);
-            });
+            }, { passive: false });
             
             container.appendChild(pointElement);
         });
-        console.log('포인트 렌더링 완료, 총', this.calibrationPoints.length, '개');
+        console.log('✅ 포인트 렌더링 완료, 총', this.calibrationPoints.length, '개');
+        console.log('첫 번째 포인트 위치:', this.calibrationPoints[0]);
     }
 
     // 캘리브레이션 포인트 활성화
