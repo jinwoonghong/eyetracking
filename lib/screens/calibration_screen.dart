@@ -108,6 +108,7 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(); // 다이얼로그 닫기
+              Navigator.of(context).pop(true); // 캘리브레이션 화면 닫기 (true 반환)
             },
             child: const Text('확인'),
           ),

@@ -3,8 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/track.dart';
 import '../models/game_state.dart';
 import '../models/game_result.dart';
+import '../services/audio_service.dart';
 
 class GameProvider extends ChangeNotifier {
+  final AudioService _audioService = AudioService();
   // 게임 상태
   GameState _gameState = GameState.menu;
   GameState get gameState => _gameState;
@@ -73,6 +75,10 @@ class GameProvider extends ChangeNotifier {
     _isFeverMode = false;
     _isOnTrack = true;
     _elapsedTime = 0;
+
+    // 게임 음악 재생
+    _audioService.playGameMusic();
+
     notifyListeners();
   }
 
@@ -80,6 +86,7 @@ class GameProvider extends ChangeNotifier {
   void pauseGame() {
     if (_gameState == GameState.playing) {
       _gameState = GameState.paused;
+      _audioService.pauseMusic();
       notifyListeners();
     }
   }
@@ -88,6 +95,7 @@ class GameProvider extends ChangeNotifier {
   void resumeGame() {
     if (_gameState == GameState.paused) {
       _gameState = GameState.playing;
+      _audioService.resumeMusic();
       notifyListeners();
     }
   }
@@ -96,6 +104,11 @@ class GameProvider extends ChangeNotifier {
   void endGame() {
     _gameState = GameState.finished;
     _saveGameResult();
+
+    // 완료 사운드 및 음악 정지
+    _audioService.playGameComplete();
+    _audioService.stopMusic();
+
     notifyListeners();
   }
 
@@ -103,6 +116,10 @@ class GameProvider extends ChangeNotifier {
   void returnToMenu() {
     _gameState = GameState.menu;
     _currentTrack = null;
+
+    // 음악 정지
+    _audioService.stopMusic();
+
     notifyListeners();
   }
 
@@ -151,6 +168,9 @@ class GameProvider extends ChangeNotifier {
     // 정확도 감소
     _accuracy = (_accuracy - 5.0).clamp(0.0, 100.0);
 
+    // 사운드 및 진동
+    _audioService.playOffTrack();
+
     debugPrint('Penalty applied - Speed: $_speedMultiplier, Accuracy: $_accuracy');
   }
 
@@ -175,6 +195,11 @@ class GameProvider extends ChangeNotifier {
     final multiplier = _isFeverMode ? 2.0 : 1.0;
     _score += (baseScore * multiplier).toInt();
 
+    // 콤보 사운드 (매 5 콤보마다)
+    if (_combo % 5 == 0) {
+      _audioService.playCombo(_combo);
+    }
+
     // 피버 모드 체크
     if (_feverGauge >= 100.0 && !_isFeverMode) {
       _activateFeverMode();
@@ -188,6 +213,11 @@ class GameProvider extends ChangeNotifier {
   void _activateFeverMode() {
     _isFeverMode = true;
     _speedMultiplier = 1.5;
+
+    // 사운드 및 진동
+    _audioService.playFeverStart();
+    _audioService.playFeverMusic();
+
     debugPrint('FEVER MODE ACTIVATED!');
 
     // 10초 후 피버 모드 종료
@@ -201,6 +231,11 @@ class GameProvider extends ChangeNotifier {
     _isFeverMode = false;
     _speedMultiplier = 1.0;
     _feverGauge = 0;
+
+    // 사운드
+    _audioService.playFeverEnd();
+    _audioService.playGameMusic(); // 일반 게임 음악으로 복귀
+
     notifyListeners();
     debugPrint('Fever mode ended');
   }

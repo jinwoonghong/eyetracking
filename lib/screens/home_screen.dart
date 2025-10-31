@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../providers/eye_tracking_provider.dart';
 import '../models/game_state.dart';
-import '../models/track.dart';
-import 'calibration_screen.dart';
+import 'track_selection_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -114,38 +113,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _startGame(BuildContext context) async {
-    final eyeTracking = context.read<EyeTrackingProvider>();
-    final gameProvider = context.read<GameProvider>();
-
-    // 카메라 초기화
-    if (!eyeTracking.isCameraInitialized) {
-      await eyeTracking.initializeCamera();
-    }
-
-    // 캘리브레이션 확인
-    if (!eyeTracking.isCalibrated) {
-      if (context.mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CalibrationScreen()),
-        );
-      }
-    } else {
-      // 트랙 생성 및 게임 시작
-      final track = Track.createSampleTrack(
-        id: 'track_1',
-        name: '초보자 코스',
-        difficulty: gameProvider.difficulty,
-        theme: gameProvider.theme,
-        screenSize: MediaQuery.of(context).size,
-      );
-
-      gameProvider.startGame(track);
-
-      if (context.mounted) {
-        Navigator.of(context).pushNamed('/game');
-      }
-    }
+  void _startGame(BuildContext context) {
+    // 트랙 선택 화면으로 이동
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const TrackSelectionScreen()),
+    );
   }
 
   void _showDifficultyDialog(BuildContext context) {
