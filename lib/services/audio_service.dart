@@ -52,10 +52,10 @@ class AudioService {
     if (!_soundEnabled) return;
 
     try {
-      // 간단한 비프음으로 대체 (실제 사운드 파일이 없을 경우)
       await _soundPlayer.play(AssetSource('sounds/on_track.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      // 사운드 파일이 없는 경우 무시
+      debugPrint('Sound file not found: $e');
     }
   }
 
@@ -66,7 +66,7 @@ class AudioService {
     try {
       await _soundPlayer.play(AssetSource('sounds/off_track.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Sound file not found: $e');
     }
 
     // 진동
@@ -82,7 +82,7 @@ class AudioService {
     try {
       await _soundPlayer.play(AssetSource('sounds/combo.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Sound file not found: $e');
     }
 
     // 콤보가 높을수록 강한 진동
@@ -98,7 +98,7 @@ class AudioService {
     try {
       await _soundPlayer.play(AssetSource('sounds/fever_start.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Sound file not found: $e');
     }
 
     // 강한 진동
@@ -114,7 +114,7 @@ class AudioService {
     try {
       await _soundPlayer.play(AssetSource('sounds/fever_end.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Sound file not found: $e');
     }
   }
 
@@ -125,7 +125,7 @@ class AudioService {
     try {
       await _soundPlayer.play(AssetSource('sounds/game_complete.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Sound file not found: $e');
     }
 
     // 축하 진동 패턴
@@ -141,7 +141,7 @@ class AudioService {
     try {
       await _soundPlayer.play(AssetSource('sounds/click.mp3'));
     } catch (e) {
-      debugPrint('Sound error: $e');
+      debugPrint('Sound file not found: $e');
     }
   }
 
@@ -157,7 +157,7 @@ class AudioService {
       await _musicPlayer.play(AssetSource('sounds/menu_bgm.mp3'));
       _musicPlayer.setVolume(0.5);
     } catch (e) {
-      debugPrint('Music error: $e');
+      debugPrint('Music file not found: $e');
     }
   }
 
@@ -169,7 +169,7 @@ class AudioService {
       await _musicPlayer.play(AssetSource('sounds/game_bgm.mp3'));
       _musicPlayer.setVolume(0.4);
     } catch (e) {
-      debugPrint('Music error: $e');
+      debugPrint('Music file not found: $e');
     }
   }
 
@@ -181,7 +181,7 @@ class AudioService {
       await _musicPlayer.play(AssetSource('sounds/fever_bgm.mp3'));
       _musicPlayer.setVolume(0.6);
     } catch (e) {
-      debugPrint('Music error: $e');
+      debugPrint('Music file not found: $e');
     }
   }
 

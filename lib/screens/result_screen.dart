@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../services/share_service.dart';
+import '../models/game_result.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -234,10 +236,23 @@ class ResultScreen extends StatelessWidget {
   }
 
   void _shareResult(BuildContext context) {
-    // TODO: 소셜 공유 기능 구현
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('공유 기능은 준비 중입니다')),
-    );
+    final gameProvider = context.read<GameProvider>();
+
+    // 현재 게임 결과를 GameResult 객체로 생성
+    if (gameProvider.currentTrack != null) {
+      final result = GameResult(
+        trackId: gameProvider.currentTrack!.id,
+        score: gameProvider.score,
+        accuracy: gameProvider.accuracy,
+        maxCombo: gameProvider.combo,
+        elapsedTime: gameProvider.elapsedTime,
+        difficulty: gameProvider.difficulty,
+        theme: gameProvider.theme,
+        timestamp: DateTime.now(),
+      );
+
+      ShareService().shareGameResult(result, context);
+    }
   }
 
   void _returnToMenu(BuildContext context) {
