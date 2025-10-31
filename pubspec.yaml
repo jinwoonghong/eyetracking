@@ -1,0 +1,41 @@
+name: star_tracer
+description: 시선 추적 기반 웰니스 게임 - Star Tracer
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 카메라 및 ML
+  camera: ^0.10.5+5
+  google_mlkit_face_detection: ^0.9.0
+
+  # 상태 관리
+  provider: ^6.1.1
+
+  # 로컬 저장
+  shared_preferences: ^2.2.2
+
+  # 유틸리티
+  collection: ^1.18.0
+  vector_math: ^2.1.4
+
+  # UI
+  flutter_svg: ^2.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/images/
+    - assets/sounds/
